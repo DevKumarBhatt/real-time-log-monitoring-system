@@ -1,174 +1,167 @@
-# Real-Time Log Monitoring System
+# 🔎 Real-Time Log Monitoring System
 
-A Python-based real-time log monitoring system that generates application logs, detects log events, stores them in PostgreSQL, exposes REST APIs through FastAPI, and displays live logs through a WebSocket-powered dashboard.
+A Python-based real-time log monitoring system that generates application
+logs, detects log events, stores them in PostgreSQL, exposes REST APIs
+through FastAPI, and displays live logs through a WebSocket-powered dashboard.
 
-## Features
+---
 
-- Real-time application log generation
-- Automatic log monitoring
-- INFO, WARNING, ERROR and CRITICAL log detection
-- PostgreSQL log storage
-- REST API using FastAPI
-- Log statistics API
-- WebSocket-based real-time updates
-- Live monitoring dashboard
-- Swagger/OpenAPI documentation
-- Automated API tests using Pytest
+## 🚀 Key Features
 
-## Tech Stack
+- 🔄 Real-time application log generation
+- 👀 Automatic log monitoring
+- 🚦 INFO, WARNING, ERROR and CRITICAL log detection
+- 🗄️ PostgreSQL log storage
+- ⚡ FastAPI REST APIs
+- 📡 WebSocket-based real-time updates
+- 📊 Live monitoring dashboard
+- 📈 Log statistics API
+- 📚 Swagger / OpenAPI documentation
+- 🧪 Automated API testing with Pytest
 
-- Python
-- FastAPI
-- Uvicorn
-- SQLAlchemy
-- PostgreSQL
-- Pydantic
-- WebSockets
-- Pandas
-- Pytest
-- HTML
-- CSS
-- JavaScript
+---
 
-## Project Architecture
+## 🏗️ System Architecture
 
 ```text
-Application
-    ↓
-Log Generator
-    ↓
-application.log
-    ↓
-Log Monitor
-    ↓
-PostgreSQL
-    ↓
-FastAPI
-    ↓
-REST API / WebSocket+
-    ↓
-Live DashboardProject Structure
+                ┌──────────────────────┐
+                │    Log Generator     │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │   application.log    │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │     Log Monitor      │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │     PostgreSQL       │
+                │     logmonitor_db    │
+                └──────────┬───────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │       FastAPI        │
+                │      REST API        │
+                └──────────┬───────────┘
+                           │
+                ┌──────────┴───────────┐
+                ▼                      ▼
+        ┌───────────────┐      ┌───────────────┐
+        │   Dashboard   │      │ API Clients   │
+        │  WebSocket    │      │   / Swagger   │
+        └───────────────┘      └───────────────┘
+🛠️ Tech Stack
+Technology	Purpose
+Python	Core application
+FastAPI	REST API
+PostgreSQL	Log storage
+WebSocket	Real-time updates
+Pytest	API testing
+HTML / CSS / JavaScript	Dashboard
+Swagger / OpenAPI	API documentation
+📂 Project Structure
 real-time-log-monitoring-system/
 │
 ├── app/
 │   ├── main.py
-│   ├── database.py
-│   ├── models.py
-│   ├── schemas.py
-│   │
 │   ├── routes/
-│   │   └── logs.py
-│   │
-│   └── services/
-│       ├── log_generator.py
-│       └── log_monitor.py
+│   ├── schemas.py
+│   └── ...
 │
 ├── dashboard/
-│   └── index.html
-│
-├── logs/
+│   └── ...
 │
 ├── tests/
-│   ├── __init__.py
-│   └── test_api.py
+│   └── ...
 │
-├── .gitignore
+├── log_generator.py
+├── log_monitor.py
 ├── requirements.txt
+├── .gitignore
 └── README.md
+⚙️ How It Works
+1. Generate Logs
 
-Setup
-1. Clone the repository
+The log generator continuously creates application logs.
+
+2. Monitor Logs
+
+The monitoring service detects newly generated log entries.
+
+3. Store Logs
+
+Detected logs are processed and stored in PostgreSQL.
+
+4. Expose API
+
+FastAPI provides REST endpoints for accessing the stored logs and
+statistics.
+
+5. Real-Time Dashboard
+
+WebSocket communication allows the dashboard to receive live log updates.
+
+▶️ Getting Started
+Clone the repository
 git clone https://github.com/DevKumarBhatt/real-time-log-monitoring-system.git
+Go to the project directory
 cd real-time-log-monitoring-system
-2. Create virtual environment
+Create virtual environment
 python -m venv venv
-3. Activate virtual environment
+Activate virtual environment
 
-Windows PowerShell:
+Windows:
 
-.\venv\Scripts\Activate.ps1
-4. Install dependencies
+venv\Scripts\activate
+Install dependencies
 pip install -r requirements.txt
-Environment Variables
+Configure PostgreSQL
 
-Create a .env file:
+Create the required PostgreSQL database and configure the database
+connection used by the application.
 
-DATABASE_URL=postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/logmonitor_db
-
-Replace YOUR_PASSWORD with your PostgreSQL password.
-
-Running the Project
-Start FastAPI
+Run the application
 uvicorn app.main:app --reload
+📚 API Documentation
 
-API:
-
-http://127.0.0.1:8000
-
-Swagger documentation:
+After starting the FastAPI server, API documentation is available through
+Swagger/OpenAPI.
 
 http://127.0.0.1:8000/docs
-Start Log Generator
+🧪 Testing
 
-Open another terminal:
-
-python -m app.services.log_generator
-Start Log Monitor
-
-Open another terminal:
-
-python -m app.services.log_monitor
-Dashboard
-
-Open:
-
-http://127.0.0.1:8000/dashboard
-
-The dashboard provides:
-
-Total log count
-INFO count
-WARNING count
-ERROR count
-CRITICAL count
-Live log stream
-WebSocket connection status
-API Endpoints
-Method	Endpoint	Description
-GET	/	API status
-GET	/health	Health check
-GET	/logs/	Retrieve logs
-GET	/logs/stats	Log statistics
-WebSocket	/ws/logs	Real-time log stream
-GET	/dashboard	Monitoring dashboard
-Testing
+The project includes automated API tests using Pytest.
 
 Run:
 
-python -m pytest -v
+pytest
+📊 Dashboard
 
-Current test result:
+The project includes a live monitoring dashboard that displays
+application log activity and real-time updates.
 
-4 passed
-
-Tests cover:
-
-Root endpoint
-Health endpoint
-Logs endpoint
-Statistics endpoint
-Future Improvements
-Email and Slack alerts
-Log filtering and search
-Date/time based analytics
-Error-rate monitoring
-Authentication and authorization
-Docker deployment
-Redis/Celery integration
-Advanced log analytics
-Production deployment
-Author
-
+🔮 Future Improvements
+🔐 API authentication and authorization
+🚨 Email / notification alerts for critical errors
+🐳 Docker deployment
+☁️ Cloud deployment
+📊 Advanced log analytics
+🔍 Log search and filtering
+👥 Multi-user monitoring
+📈 Historical log visualizations
+👨‍💻 Author
 Dev Kumar Bhatt
 
-GitHub: https://github.com/DevKumarBhatt
+Python Developer | Data Analyst | Backend Developer
+
+GitHub:
+https://github.com/DevKumarBhatt
+
+LinkedIn:
+https://linkedin.com/in/dev-kumar-bhatt-b74540347
