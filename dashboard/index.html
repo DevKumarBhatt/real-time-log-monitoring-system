@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Real-Time Log Monitoring</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 25px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: #334155;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .connected {
+            background: #166534;
+            color: #bbf7d0;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .card h3 {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logs-container {
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            overflow: hidden;
+        }
+
+        .logs-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .logs-header h2 {
+            margin-bottom: 5px;
+        }
+
+        .logs-header p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        th {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .level {
+            font-weight: bold;
+        }
+
+        .INFO {
+            color: #38bdf8;
+        }
+
+        .WARNING {
+            color: #facc15;
+        }
+
+        .ERROR {
+            color: #fb7185;
+        }
+
+        .CRITICAL {
+            color: #f43f5e;
+        }
+
+        .message {
+            max-width: 600px;
+        }
+
+        @media (max-width: 900px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            body {
+                padding: 15px;
+            }
+
+            .message {
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Real-Time Log Monitoring System</h1>
+
+    <p class="subtitle">
+        Monitor application logs in real time
+    </p>
+
+    <div id="connectionStatus" class="status">
+        Connecting...
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total Logs</h3>
+            <p id="total">0</p>
+        </div>
+
+        <div class="card">
+            <h3>INFO</h3>
+            <p id="info">0</p>
+        </div>
+
+        <div class="card">
+            <h3>WARNING</h3>
+            <p id="warning">0</p>
+        </div>
+
+        <div class="card">
+            <h3>ERROR</h3>
+            <p id="error">0</p>
+        </div>
+
+        <div class="card">
+            <h3>CRITICAL</h3>
+            <p id="critical">0</p>
+        </div>
+
+    </div>
+
+    <div class="logs-container">
+
+        <div class="logs-header">
+            <h2>Live Logs</h2>
+            <p>New logs will appear automatically</p>
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                    <th>Level</th>
+                    <th>Message</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+
+            <tbody id="logsTable">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const statusElement =
+        document.getElementById("connectionStatus");
+
+    const logsTable =
+        document.getElementById("logsTable");
+
+
+    // Load statistics
+    async function loadStats() {
+
+        try {
+
+            const response =
+                await fetch("/logs/stats");
+
+            const data =
+                await response.json();
+
+            document.getElementById("total").textContent =
+                data.total;
+
+            document.getElementById("info").textContent =
+                data.INFO;
+
+            document.getElementById("warning").textContent =
+                data.WARNING;
+
+            document.getElementById("error").textContent =
+                data.ERROR;
+
+            document.getElementById("critical").textContent =
+                data.CRITICAL;
+
+        } catch (error) {
+
+            console.error("Stats error:", error);
+
+        }
+    }
+
+
+    // Add new log to table
+    function addLog(log) {
+
+        const row =
+            document.createElement("tr");
+
+        const time =
+            new Date(log.timestamp)
+                .toLocaleString();
+
+        row.innerHTML = `
+            <td>${log.id}</td>
+
+            <td>${time}</td>
+
+            <td class="level ${log.level}">
+                ${log.level}
+            </td>
+
+            <td class="message">
+                ${log.message}
+            </td>
+
+            <td>
+                ${log.source || "-"}
+            </td>
+        `;
+
+        logsTable.prepend(row);
+
+
+        // Keep only latest 100 logs
+        while (logsTable.children.length > 100) {
+
+            logsTable.removeChild(
+                logsTable.lastChild
+            );
+
+        }
+    }
+
+
+    // WebSocket connection
+    function connectWebSocket() {
+
+        const protocol =
+            window.location.protocol === "https:"
+                ? "wss:"
+                : "ws:";
+
+        const socket =
+            new WebSocket(
+                `${protocol}//${window.location.host}/ws/logs`
+            );
+
+
+        socket.onopen = function () {
+
+            statusElement.textContent =
+                "● Connected - Live Monitoring";
+
+            statusElement.classList.add(
+                "connected"
+            );
+
+        };
+
+
+        socket.onmessage = function (event) {
+
+            const log =
+                JSON.parse(event.data);
+
+            addLog(log);
+
+            loadStats();
+
+        };
+
+
+        socket.onclose = function () {
+
+            statusElement.textContent =
+                "Disconnected - Reconnecting...";
+
+            statusElement.classList.remove(
+                "connected"
+            );
+
+            setTimeout(
+                connectWebSocket,
+                3000
+            );
+
+        };
+
+
+        socket.onerror = function (error) {
+
+            console.error(
+                "WebSocket error:",
+                error
+            );
+
+        };
+
+    }
+
+
+    // Initial statistics
+    loadStats();
+
+    // Refresh statistics every 2 seconds
+    setInterval(
+        loadStats,
+        2000
+    );
+
+    // Start WebSocket
+    connectWebSocket();
+
+</script>
+
+</body>
+</html>
